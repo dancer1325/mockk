@@ -339,7 +339,6 @@ Note 2: there is a known issue if using a spy with a suspending function: https:
     func()
     ```
 
-
 ### Partial mocking
 
 * TODO:
@@ -362,31 +361,32 @@ assertEquals(4, adder.addOne(3)) // original function is called
 
 ### Mock relaxed for functions returning Unit
 
-If you want `Unit`-returning functions to be relaxed, you can use `relaxUnitFun = true` as an argument to the `mockk` function, 
-`@MockK`annotation or `MockKAnnotations.init` function.
+* if you want `Unit`-returning functions / be relaxed -> use `relaxUnitFun = true` argument |
+  * `mockk` function OR
 
-Function:
-```kotlin
-mockk<ClassBeingMocked>(relaxUnitFun = true)
-```
+    ```kotlin
+    mockk<ClassBeingMocked>(relaxUnitFun = true)
+    ```
 
-Annotation:
-```kotlin
-@MockK(relaxUnitFun = true)
-lateinit var mock1: ClassBeingMocked
-init {
-    MockKAnnotations.init(this)
-}
-```
+  * `@MockK`annotation OR
 
-MockKAnnotations.init:
-```kotlin
-@MockK
-lateinit var mock2: ClassBeingMocked
-init {
-    MockKAnnotations.init(this, relaxUnitFun = true)
-}
-```
+    ```kotlin
+    @MockK(relaxUnitFun = true)
+    lateinit var mock1: ClassBeingMocked
+    init {
+        MockKAnnotations.init(this)
+    }
+    ```
+
+  * `MockKAnnotations.init` function
+    
+    ```kotlin
+    @MockK
+    lateinit var mock2: ClassBeingMocked
+    init {
+        MockKAnnotations.init(this, relaxUnitFun = true)
+    }
+    ```
 
 ### Object mocks
 
