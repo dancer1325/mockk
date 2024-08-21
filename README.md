@@ -225,48 +225,57 @@ class CarTest {
 
 #### JUnit5
 
-In JUnit5 you can use `MockKExtension` to initialize your mocks. 
+* steps
+  * add `MockKExtension` -- to initialize -- your mocks 
 
-```kotlin
-@ExtendWith(MockKExtension::class)
-class CarTest {
-  @MockK
-  lateinit var car1: Car
+    ```kotlin
+    @ExtendWith(MockKExtension::class)
+    class CarTest {
+      @MockK
+      lateinit var car1: Car
+    
+      @RelaxedMockK
+      lateinit var car2: Car
+    
+      @MockK(relaxUnitFun = true)
+      lateinit var car3: Car
+    
+      @SpyK
+      var car4 = Car()
+    
+      @Test
+      fun calculateAddsValues1() {
+          // ... use car1, car2, car3 and car4
+      }
+    }
+    ```
 
-  @RelaxedMockK
-  lateinit var car2: Car
+* `MockKExtension`
+  * allows
+    * using `@MockK` and `@RelaxedMockK` | test function parameters
 
-  @MockK(relaxUnitFun = true)
-  lateinit var car3: Car
-
-  @SpyK
-  var car4 = Car()
-
-  @Test
-  fun calculateAddsValues1() {
-      // ... use car1, car2, car3 and car4
-  }
-}
-```
-
-Additionally, it adds the possibility to use `@MockK` and `@RelaxedMockK` on test function parameters:
-
-```kotlin
-@Test
-fun calculateAddsValues1(@MockK car1: Car, @RelaxedMockK car2: Car) {
-  // ... use car1 and car2
-}
-```
-
-Finally, this extension will call `unmockkAll` and `clearAllMocks` in a `@AfterAll` callback, ensuring your test environment is clean after
-each test class execution.
-You can disable this behavior by adding the `@MockKExtension.KeepMocks` annotation to your class or globally by setting 
-the `mockk.junit.extension.keepmocks=true` property.
-(Since v1.13.11)
-Alternatively, since `clearAllMocks` by default (`currentThreadOnly=false`) is not thread-safe, if you need to run test in parallel you can add the 
-`MockKExtension.RequireParallelTesting` annotation to your class or set the `mockk.junit.extension.requireParallelTesting=true`
-property to disable calling it in the `@AfterAll` callback.
-If `clearAllMocks` is explicitly called, you can supply `clearAllMocks(currentThreadOnly = true)` so that it only clears mocks created within the same thread (since v1.13.12).
+        ```kotlin
+        @Test
+        fun calculateAddsValues1(@MockK car1: Car, @RelaxedMockK car2: Car) {
+          // ... use car1 and car2
+        }
+        ```
+  * what does it do?
+    * call | `@AfterAll` callback
+      * `unmockkAll`
+      * `clearAllMocks`
+        * == clean ALL mocks | after test class execution
+    * ways to disable previous behavior
+      * `@MockKExtension.KeepMocks` | your class
+      * `mockk.junit.extension.keepmocks=true` property -> globally 
+    * ways to disable `clearAllMocks` is called by `@AfterAll` callback 
+      * From v1.13.11+
+        * by default, `currentThreadOnly=false` == NOT thread-safe
+          * if you need to run test in parallel -> you need to add
+            * `MockKExtension.RequireParallelTesting` | your class or
+            * `mockk.junit.extension.requireParallelTesting=true` | property -> globally
+      * From v1.13.12+
+        * if `clearAllMocks` is explicitly called & ONLY want to clear mocks | same thread -> call `clearAllMocks(currentThreadOnly = true)`
 
 #### Automatic verification confirmation
 
@@ -302,36 +311,38 @@ Note 2: there is a known issue if using a spy with a suspending function: https:
 
 ### Relaxed mock
 
-A `relaxed mock` is the mock that returns some simple value for all functions. 
-This allows you to skip specifying behavior for each case, while still stubbing things you need.
-For reference types, chained mocks are returned.
+* := mock / returns some simple value | ALL functions
+  * allows
+    * skipping to specify behavior / each case
+  * return chained mocks | reference types
 
-```kotlin
-val car = mockk<Car>(relaxed = true)
+    ```kotlin
+    val car = mockk<Car>(relaxed = true)
+    
+    car.drive(Direction.NORTH) // returns null
+    
+    verify { car.drive(Direction.NORTH) }
+    
+    confirmVerified(car)
+    ```
 
-car.drive(Direction.NORTH) // returns null
+  * ⚠️ works badly | generic return types ⚠️
+    * == -- usually throws -- class cast exception
+    * workaround
 
-verify { car.drive(Direction.NORTH) }
+    ```kotlin
+    val func = mockk<() -> Car>(relaxed = true) // in this case invoke function has generic return type
+    
+    // this line is workaround, without it the relaxed mock would throw a class cast exception on the next line
+    every { func() } returns Car() // or you can return mockk() for example 
+    
+    func()
+    ```
 
-confirmVerified(car)
-```
-
-Note: relaxed mocking is working badly with generic return types. A class cast exception is usually thrown in this case.
-Opt for stubbing manually in the case of a generic return type.
-
-Workaround:
-
-```kotlin
-val func = mockk<() -> Car>(relaxed = true) // in this case invoke function has generic return type
-
-// this line is workaround, without it the relaxed mock would throw a class cast exception on the next line
-every { func() } returns Car() // or you can return mockk() for example 
-
-func()
-```
 
 ### Partial mocking
 
+* TODO:
 Sometimes, you need to stub some functions, but still call the real method on others, or on specific arguments.
 This is possible by passing `callOriginal()` to `answers`, which works for both relaxed and non-relaxed mocks.
 
