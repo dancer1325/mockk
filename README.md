@@ -1567,3 +1567,5 @@ To report bugs, please use the GitHub project.
 
 * Project Page: [https://github.com/mockk/mockk](https://github.com/mockk/mockk)
 * Reporting Bugs: [https://github.com/mockk/mockk/issues](https://github.com/mockk/mockk/issues)
+
+⭐ Wiki / basic ideas -- [Link](https://github.com/mockk/mockk/wiki) -- ⭐
