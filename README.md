@@ -293,11 +293,11 @@ class CarTest {
 
 #### Automatic verification confirmation
 
-You can make sure that all stubbed methods are actually verified by also annotating your test class with `@MockKExtension.ConfirmVerification`.
-
-This will internally call `confirmVerified` on all mocks after each test, to make sure there are no unnecessary stubbings.
-
-Please note that this behavior may not work as expected when running tests in your IDE, as it is Gradle who takes care of handling the exception being thrown when these `confirmVerified` calls fail.
+* `@MockKExtension.ConfirmVerification`
+  * guarantee that ALL stubbed methods are actually verified
+    * how does it work? call `confirmVerified` | ALL mocks | after each test
+  * if you run tests | your IDE -> this behavior may NOT work as expected
+    * Reason: 🧠 if `confirmVerified` calls fail -> Gradle is really the one / handle the exception 🧠
 
 #### Automatic unnecessary stubbing check
 
