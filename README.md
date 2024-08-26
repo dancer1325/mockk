@@ -150,7 +150,8 @@ Check the series of articles "Mocking is not rocket science" at [Kt. Academy](ht
 
 ### Annotations
 
-You can use annotations to simplify the creation of mock objects:
+* allows
+  * simplifying the creation of mock objects
 
 ```kotlin
 
@@ -188,16 +189,29 @@ class CarTest {
 }
 ```
 
-Injection first tries to match properties by name, then by class or superclass. 
-Check the `lookupType` parameter for customization. 
-
-Properties are injected even if `private` is applied. Constructors for injection are selected from the biggest 
-number of arguments to lowest.
-
-`@InjectMockKs` by default injects only `lateinit var`s or `var`s that are not assigned. 
-To change this, use `overrideValues = true`. This would assign the value even if it is already initialized somehow.
-To inject `val`s, use `injectImmutable = true`. For a shorter notation use `@OverrideMockKs` which does the same as 
-`@InjectMockKs` by default, but turns these two flags on.
+* properties injection
+  * ALSO for `private`
+* constructors for injection
+  * selected / biggest # of arguments -- to -> lowest
+* `@InjectMockKs`
+  * inject
+    * matching properties
+      * by default, in the order
+        * name
+        * class
+        * superclass
+      * if you want to customize -> specify `lookupType`
+    * variables `var`
+      * by default, ONLY
+        * `lateinit var`s OR
+        * `var`s / NOT assigned
+      * if you want to customize -> use `overrideValues = true`
+    * variables `val`s
+      * requirements
+        * use `injectImmutable = true`
+* `@OverrideMockKs`
+  * alternative to `@InjectMockKs`
+  * by default, `overrideValues = true`
 
 ### JUnit4
 
