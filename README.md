@@ -956,7 +956,15 @@ Note: there is a known issue if using a spy with a suspending function: https://
 
 ### Top Level functions
 
-Kotlin lets you declare functions that don’t belong to any class or object, called top-level functions. These calls are translated to static methods in `jvm` environments, and a special Java class is generated to hold the functions. These top-level functions can be mocked using `mockkStatic`. You just need to import the function and pass a reference as the argument:
+* := functions / do NOT belong to ANY class OR object
+  * Check [Kotlin documentation](https://kotlinlang.org/docs/functions.html#function-scope)
+  * calls to these functions -- are translated to -- static methods | `jvm` environments / special Java class
+    * is generated
+    * hold the functions
+  * ways to mock them
+    * `mockkStatic`
+      * once you use -> clear ANY mocks of other functions | same file
+        * == call `clearStaticMockk` | generated enclosing class
 
 ```kotlin
 import com.cars.buildCar
@@ -969,8 +977,6 @@ assertEquals(testCar, buildCar())
 
 verify { buildCar() }
 ```
-
-Mocking a function will clear any existing mocks of other functions declared in the same file, equivalent to calling `clearStaticMockk` on the generated enclosing class.
 
 ### Extension functions
 
@@ -1025,10 +1031,11 @@ verify {
 }
 ```
 
-In `jvm` environments you can replace the class name with a function reference:
-```kotlin
-mockkStatic(Obj::extensionFunc)
-```
+* | `jvm` environments
+  * className -- can be replaced by a -- function reference
+    ```kotlin
+    mockkStatic(Obj::extensionFunc)
+    ```
 Note that this will mock the whole `pkg.FileKt` class, and not just `extensionFunc`. 
 
 This syntax also applies for extension properties:
@@ -1038,15 +1045,15 @@ val Obj.squareValue get() = value * value
 mockkStatic(Obj::squareValue)
 ```
 
-If `@JvmName` is used, specify it as a class name.
+* if you use `@JvmName` -> you need to specify the className
 
-KHttp.kt:
-```kotlin
-@file:JvmName("KHttp")
-
-package khttp
-// ... KHttp code 
-```
+    ```kotlin
+    // KHttp.kt -> "KHttp" is the className
+    @file:JvmName("KHttp")
+    
+    package khttp
+    // ... KHttp code 
+    ```
 
 Testing code:
 ```kotlin
